@@ -1,10 +1,16 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import ScotchInfoBar from './ScotchInfoBar';
-import './styles.css';
+import React, { useState } from "react";
+import ReactDOM from "react-dom";
+import ScotchInfoBar from "./ScotchInfoBar";
+import "./styles.css";
 
 function App() {
-  const apiURL = 'https://www.anapioficeandfire.com/api/books?pageSize=30';
+  const [books, setBooks] = useState([]);
+  const apiURL = "https://www.anapioficeandfire.com/api/books?pageSize=30";
+  function fetchData() {
+    fetch(apiURL)
+      .then((res) => res.json())
+      .then((data) => setBooks(data));
+  }
 
   return (
     <div className="App">
@@ -13,7 +19,9 @@ function App() {
 
       {/* Fetch data from API */}
       <div>
-        <button className="fetch-button">Fetch Data</button>
+        <button onClick={() => fetchData()} className="fetch-button">
+          Fetch Data
+        </button>
         <br />
       </div>
 
@@ -21,17 +29,25 @@ function App() {
 
       {/* Use JSX below for each book */}
       <div className="books">
-        <div className="book">
-          <h3>Book Number</h3>
-          <h2>Book Name</h2>
+        {books &&
+          books.map((book, index) => {
+            const cleanedDate = new Date(book.released).toDateString();
+            const authors = book.authors.join(", ");
 
-          <div className="details">
-            <p>👨: Author/Authors</p>
-            <p>📖: Number of pages</p>
-            <p>🏘️: Book Country</p>
-            <p>⏰: Release date</p>
-          </div>
-        </div>
+            return (
+              <div className="book">
+                <h3>Book {index + 1}</h3>
+                <h2>{book.name}</h2>
+
+                <div className="details">
+                  <p>👨: {authors}</p>
+                  <p>📖: {book.numberOfPages}</p>
+                  <p>🏘️: {book.country}</p>
+                  <p>⏰: {cleanedDate}</p>
+                </div>
+              </div>
+            );
+          })}
       </div>
 
       <ScotchInfoBar seriesNumber="7" />
@@ -39,5 +55,5 @@ function App() {
   );
 }
 
-const rootElement = document.getElementById('root');
+const rootElement = document.getElementById("root");
 ReactDOM.render(<App />, rootElement);
